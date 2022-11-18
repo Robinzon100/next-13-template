@@ -1,0 +1,208 @@
+---
+title: "other other other"
+tag: "design"
+date: "2022/10/20"
+excerpt: "some sort of fancy shancy excerpt"
+min_read: 12
+thumbnail_image_url: "/blog/posts/name_of_a_post/picture.png"
+author_name: "Robinzon Something"
+author_image_url: "robinzon-something"
+author_social: "https://twitter.com/oxeni_stuio"
+highlighted: true
+---
+
+
+
+# hello there
+
+## hi
+
+---
+
+- a
+- [ ] Mercury
+
+<input type="checkbox" name="" id="" />
+
+
+<Image
+  src={"/pictures/contact_phone.png"}
+  alt="Picture of the author"
+  width={1000}
+  height={700}
+/>
+
+
+
+```scss {1,3,5} showLineNumbers
+.display {
+  display: none;
+}
+
+.hero {
+  position: relative;
+
+  .hero_container {
+    width: 100%;
+    height: 100vh;
+
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+
+    .hero_landing_canvas {
+      position: absolute;
+
+      @media only screen and (max-width: 800px) {
+        position: relative;
+      }
+    }
+
+    .introduction {
+      margin: 11.5vw 0 13vw var(--left-margin);
+      z-index: 2;
+
+      .introduction-container {
+        @include flex(center, initial, column);
+
+        .contact_btn,
+        .heading,
+        .line,
+        .paragraph {
+          opacity: 0;
+          transform: translateY(20%);
+        }
+
+        .heading {
+          width: 100%;
+          max-width: 40rem;
+
+          @media only screen and (max-width: 1200px) {
+            max-width: 30rem;
+          }
+          h1 {
+            color: var(--primary-black);
+            line-height: 121.7%;
+          }
+        }
+
+        .line {
+          width: 35px;
+          height: 3px;
+          background-color: var(--light-black);
+          margin: calc(1rem + 0.8vw) 0vw;
+        }
+
+        .paragraph {
+          width: 100%;
+          max-width: 29rem;
+
+          @media only screen and (max-width: 1200px) {
+            max-width: 23rem;
+          }
+
+          p {
+            color: var(--light-black);
+            line-height: 156.2%;
+          }
+        }
+
+        .hero_button {
+          margin-top: calc(2.5rem + 1vw);
+        }
+      }
+    }
+  }
+}
+
+@media only screen and (max-width: $medium-screen) {
+  .hero {
+    background-color: white !important;
+
+    .hero_container {
+      display: grid;
+      grid-template-rows: 1fr auto;
+      grid-template-columns: initial !important;
+      height: initial !important;
+
+      .introduction {
+        margin: 23vw 6vw 0vw 6vw;
+
+        .introduction-container {
+          .hero_button {
+            padding: 15px 50px !important;
+          }
+        }
+      }
+    }
+  }
+}
+
+@media only screen and (max-width: $small-screen) {
+  .hero {
+    .hero_container {
+      .introduction {
+        margin: 8vw 6vw 0vw 5vw;
+      }
+    }
+  }
+}
+```
+
+```jsx
+import fs from "fs/promises";
+import matter from "gray-matter";
+import { serialize } from "next-mdx-remote/serialize";
+import MdxWrapper from "components/blog/mdxWrapper";
+import rehypeSlug from "rehype-slug";
+import rehypeAutolinkHeadings from "rehype-autolink-headings";
+import rehypePrism from "@mapbox/rehype-prism";
+import "./syntax-hightlight.css";
+
+const getMarkdownFile = async (fileName: string) => {
+  try {
+    const rawMarkdownFile = await fs.readFile(
+      "posts/" + fileName + ".mdx",
+      "utf8"
+    );
+    const { content, data } = matter(rawMarkdownFile);
+    const compiledSource = await serialize(content, {
+      mdxOptions: {
+        rehypePlugins: [
+          rehypeSlug,
+          [
+            rehypeAutolinkHeadings,
+            {
+              behavior: "wrap",
+            },
+          ],
+          rehypePrism,
+        ],
+      },
+    });
+
+    return { compiledSource, data };
+  } catch (err) {
+    return "error accoured";
+  }
+};
+
+const BlogPage = async ({
+  params: { blogTitle },
+}: {
+  params: { blogTitle: string },
+}) => {
+  const { compiledSource, data }: any = await getMarkdownFile(blogTitle);
+
+  return (
+    <div>
+      <h1>{blogTitle}</h1>
+      <MdxWrapper compiledSource={compiledSource} />
+    </div>
+  );
+};
+
+export default BlogPage;
+```
+
+{/* ![image](/pictures/contact_phone.png) */}
